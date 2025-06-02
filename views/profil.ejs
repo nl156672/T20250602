@@ -23,16 +23,24 @@
     <main>
         <h1>Mein Profil</h1>
 
-        Hier sollen alle persönlichen Daten des Kunden stehen.</br>
+        <ul>
+        <li>Name: <%= kunde.Name %></li>
+        <li>Vorname: <%= kunde.Vorname %></li>
+        <li>Kundennummer: <%= kunde.Kundennummer %></li>
+        <li>Mail-Adresse: <%= kunde.Mail %></li>
+        <li>Telefonnummer: <%= kunde.Telefonnummer %></li>
+        <!-- Weitere Eigenschaften nach Bedarf -->
+    </ul>
 
-        <form method="post">            
-            <label>Mail-Adresse</label></br>
-            <input type="text" name="Email" value=<%= Email %>>
-            <button type="submit" formaction="/profil">Mail-Adresse ändern</button>
-        </form>                
-        <p><%= Meldung %></p>
-    </main>
-
+    <form method="post">
+    <label>Mail-Adresse</label><br>
+    <input type="text" name="Email" value="<%= kunde.Mail %>"><br>
+    <label>Telefonnummer</label><br>
+    <input type="text" name="Telefonnummer" value="<%= kunde.Telefonnummer %>"><br>
+    <button type="submit" formaction="/profil">Daten ändern</button>
+</form>
+<p><%= Meldung %></p>
+</main>
     <footer>
         <p>Borken-Bank AG</p>
         <p>Geschäftsführer: Hans Dampf, IBAN: DE 55 28 000 000</p>

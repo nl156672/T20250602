@@ -67,6 +67,7 @@ class Kunde{
 		// IstEingeloggt ist ein boolean.
 		// Der Wert ist entweder wahr oder falsch.
 		this.IstEingeloggt
+		this.Telefonnummer
 	}
 }
 
@@ -79,6 +80,7 @@ kunde.Vorname = "Pit"
 kunde.Benutzername = "pk"
 kunde.Kennwort = "123"
 kunde.IstEingeloggt = false
+kunde.Telefonnummer = "01234567890"
 
 // Klassenefinition des Kundenberaters
 class Kundenberater{
@@ -292,24 +294,25 @@ app.get('/kontenuebersicht', (req, res) => {
 });
 
 app.get('/profil', (req, res) => {
-	
-	if(kunde.IstEingeloggt){
-
-		// Wenn die Zugangsdaten korrekt sind, dann wird die angesurfte Seite gerendert.
-		res.render('profil.ejs',{
-			Meldung: "",
-			Email: kunde.Mail
-		});
-
-	}else{
-		
-		// Wenn die Zugangsdaten nicht korrekt sind, dann wird die login-Seite gerendert.
-		res.render('login.ejs',{
-			Meldung: "Melden Sie sich zuerst an."
-		});
-	}
+    if (kunde.IstEingeloggt) {
+        res.render('profil.ejs', { kunde: kunde });
+    } else {
+        res.render('login.ejs', { Meldung: "Melden Sie sich zuerst an." });
+    }
 });
 
+app.post('/profil', (req, res) => {
+    if (kunde.IstEingeloggt) {
+        kunde.Mail = req.body.Email;
+        kunde.Telefonnummer = req.body.Telefonnummer;
+        res.render('profil.ejs', { kunde: kunde, Meldung: "Daten wurden geändert." });
+    } else {
+        res.render('login.ejs', { Meldung: "Melden Sie sich zuerst an." });
+    }
+});
+
+
+// Die app.post wird abgearbeitet, wenn der Kunde auf dem Formular den Absenden-Button klickt.
 app.post('/profil', (req, res) => {
 	
 	var meldung = "";
@@ -377,27 +380,33 @@ app.get('/kreditBeantragen', (req, res) => {
 });
 
 
-// Kommentar: 
+// die app.post gibt die Daten an die EJS-Seite kreditBeantragen.ejs zurück, wenn der Kunde auf den Absenden-Button klickt.
 app.post('/kreditBeantragen', (req, res) => {
 
-	// Kommentar:
+	// die drei Variablen zinsbetrag, laufzeit und zinssatz werden aus dem body der Anfrage (req) ausgelesen.
 	let zinsbetrag = req.body.Betrag;
 	let laufzeit = req.body.Laufzeit;
 	let zinssatz = req.body.Zinssatz;
 
-	// Kommentar:
+	// hier wird der Rückzahlungsbetrag eines Kredits mit der Formel berechnet:
+	// es wird der Kreditbetrag mit dem Wachstumsfaktor multipliziert hoch laufzeit, um den Endbetrag nach Ablauf der Laufzeit inklusive Zinsen zu berechnen.
 	let kredit = zinsbetrag * Math.pow(1+zinssatz/100,laufzeit);
-	
-	// Kommentar:
-	console.log("Rückzahlungsbetrag: " + kredit + " €.")
 
-	// Kommentar:
+	// Rückzahlungsbetrag kaufmännisch runden und als Zahl mit zwei Nachkommastellen darstellen
+    let kreditGerundet = kredit.toFixed(2);
+	
+	// Die Rückgabe des Rückzahlungsbetrags wird in der Konsole ausgegeben.
+	console.log("Rückzahlungsbetrag: " + kreditGerundet + " €.")
+
+	// Die render-Funktion gibt die EJS-Seite kreditBeantragen.ejs an den Browser zurück.
+	// So werden die vom Nutzer eingegebenen oder berechneten Daten an die Webseite weitergegeben.
 	res.render('kreditBeantragen.ejs',{
 		Laufzeit: laufzeit,
 		Zinssatz: zinssatz,		
 		Betrag: zinsbetrag,
-		// Kommentar:
-		Meldung: "Rückzahlungsbetrag: " + kredit + " €."
+		// hier wird ein text/Nachricht erstellt, der den berechneten Rückzahlungsbetrag enthält.
+		// diese nachricht wird dann als Wert für die VAriable Meldung an die EJS übergeben, damit sie dem Nutzer auf der Webseite angezeigt wird.
+		Meldung: "Rückzahlungsbetrag: " + kreditGerundet + " €."
 	});
 });
 
